@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pahana Edu Bookshop - Seller Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-content, .print-content * {
+                visibility: visible;
+            }
+            .print-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Pahana Edu</h1>
+                <p class="text-gray-600">Bookshop Seller Panel</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+                    Sign In
+                </button>
+            </form>
+            
+            <div id="loginError" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="hidden min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="flex items-center justify-between px-6 py-4">
+                <h1 class="text-2xl font-bold text-gray-800">Pahana Edu Seller</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="userInfo" class="text-gray-600"></span>
+                    <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex">
+            <!-- Sidebar -->
+            <nav class="w-64 bg-white shadow-sm min-h-screen">
+                <div class="p-6">
+                    <ul class="space-y-2">
+                        <li>
+                            <button class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                            </button>
+                        </li>
+                        <li>
+                            
+                        </li>
+                        <li>
+                            <button class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition" data-section="items">
+                                <i class="fas fa-book mr-3"></i>Items
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition" data-section="billing">
+                                <i class="fas fa-receipt mr-3"></i>Billing
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-6">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="section">
+                    <h2 class="text-2xl font-bold mb-6">Dashboard Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-blue-100 rounded-full">
+                                    <i class="fas fa-users text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm text-gray-600">Total Customers</p>
+                                    <p id="totalCustomers" class="text-2xl font-bold">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-green-100 rounded-full">
+                                    <i class="fas fa-book text-green-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm text-gray-600">Available Items</p>
+                                    <p id="totalItems" class="text-2xl font-bold">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-3 bg-purple-100 rounded-full">
+                                    <i class="fas fa-receipt text-purple-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm text-gray-600">Today's Bills</p>
+                                    <p id="totalBills" class="text-2xl font-bold">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Section (Read Only) -->
+                <div id="customersSection" class="section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Customer Information</h2>
+                        <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm">
+                            <i class="fas fa-info-circle mr-1"></i>View Only
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b">
+                            <input type="text" id="customerSearch" placeholder="Search customers..." 
+                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account #</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody" class="divide-y divide-gray-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Section (Read Only) -->
+                <div id="itemsSection" class="section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Item Catalog</h2>
+                        <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm">
+                            <i class="fas fa-info-circle mr-1"></i>View Only
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b flex gap-4">
+                            <input type="text" id="itemSearch" placeholder="Search items..." 
+                                   class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <select id="categoryFilter" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Categories</option>
+                                <option value="Books">Books</option>
+                                <option value="Stationery">Stationery</option>
+                                <option value="Electronics">Electronics</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody" class="divide-y divide-gray-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Section -->
+                <div id="billingSection" class="section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Point of Sale</h2>
+                        <button id="createBillBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i>New Sale
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Create Bill -->
+                        <div id="createBillPanel" class="bg-white rounded-lg shadow p-6 hidden">
+                            <h3 class="text-lg font-semibold mb-4">Create New Sale</h3>
+                            <form id="billForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Customer *</label>
+                                    <select id="billCustomer" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Customer</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Add Items</label>
+                                    <div class="flex gap-2">
+                                        <select id="billItem" class="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Select Item</option>
+                                        </select>
+                                        <input type="number" id="billQuantity" placeholder="Qty" min="1" value="1"
+                                               class="w-20 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <button type="button" id="addItemToBill" 
+                                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-medium mb-2">Sale Items</h4>
+                                    <div id="billItems" class="space-y-2 mb-4">
+                                        <p class="text-gray-500 text-sm">No items added</p>
+                                    </div>
+                                    <div class="border-t pt-2">
+                                        <div class="flex justify-between font-bold text-lg">
+                                            <span>Total: </span>
+                                            <span id="billTotal" class="text-green-600">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex gap-2">
+                                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex-1 font-medium">
+                                        <i class="fas fa-cash-register mr-2"></i>Complete Sale
+                                    </button>
+                                    <button type="button" id="cancelBill" class="bg-gray-500 text-white px-4 py-3 rounded-lg hover:bg-gray-600">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Recent Sales -->
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b">
+                                <h3 class="text-lg font-semibold">Recent Sales</h3>
+                            </div>
+                            <div class="overflow-x-auto max-h-96">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Bill #</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentSalesBody" class="divide-y divide-gray-200">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats for Seller -->
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-r from-green-400 to-green-600 p-4 rounded-lg text-white">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-green-100 text-sm">Today's Sales</p>
+                                    <p id="todaySales" class="text-2xl font-bold">$0.00</p>
+                                </div>
+                                <i class="fas fa-dollar-sign text-2xl text-green-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-400 to-blue-600 p-4 rounded-lg text-white">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-blue-100 text-sm">Bills Created</p>
+                                    <p id="todayBillsCount" class="text-2xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-receipt text-2xl text-blue-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-purple-400 to-purple-600 p-4 rounded-lg text-white">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-purple-100 text-sm">Items Sold</p>
+                                    <p id="todayItemsSold" class="text-2xl font-bold">0</p>
+                                </div>
+                                <i class="fas fa-box text-2xl text-purple-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bill View Modal -->
+    <div id="billViewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold">Sale Receipt</h3>
+                <div class="flex gap-2">
+                    <button onclick="printCurrentBill()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                        <i class="fas fa-print mr-2"></i>Print Receipt
+                    </button>
+                    <button class="closeModal bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Bill Content -->
+            <div id="billViewContent" class="space-y-6">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
