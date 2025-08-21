@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer API Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">Customer API Test</h1>
+        
+        <!-- Registration Section -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Customer Registration</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" id="regUsername" placeholder="Username" class="border p-2 rounded">
+                <input type="password" id="regPassword" placeholder="Password" class="border p-2 rounded">
+                <input type="text" id="regName" placeholder="Full Name" class="border p-2 rounded">
+                <input type="email" id="regEmail" placeholder="Email" class="border p-2 rounded">
+                <input type="text" id="regPhone" placeholder="Phone" class="border p-2 rounded">
+                <input type="text" id="regAddress" placeholder="Address" class="border p-2 rounded">
+            </div>
+            <button onclick="register()" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Register</button>
+        </div>
+
+        <!-- Login Section -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Customer Login</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" id="loginUsername" placeholder="Username" class="border p-2 rounded">
+                <input type="password" id="loginPassword" placeholder="Password" class="border p-2 rounded">
+            </div>
+            <button onclick="login()" class="bg-green-500 text-white px-4 py-2 rounded mt-4">Login</button>
+        </div>
+
+        <!-- Browse Books Section -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Browse Books</h2>
+            <button onclick="browseBooks()" class="bg-purple-500 text-white px-4 py-2 rounded mb-4">Load Books</button>
+            <div id="booksContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- Create Order Section -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Create Order</h2>
+            <div class="mb-4">
+                <input type="number" id="customerId" placeholder="Customer ID" class="border p-2 rounded mr-2">
+                <button onclick="createSampleOrder()" class="bg-orange-500 text-white px-4 py-2 rounded">Create Sample Order</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Results</h2>
+            <pre id="results" class="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96"></pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/public/customer';
+        let currentCustomer = null;
+
+        function log(message, data = null) {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.textContent += `[${timestamp}] ${message}\n`;
+            if (data) {
+                results.textContent += JSON.stringify(data, null, 2) + '\n';
+            }
+            results.textContent += '\n';
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function register() {
+            const data = {
+                username: document.getElementById('regUsername').value,
+                password: document.getElementById('regPassword').value,
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                telephone: document.getElementById('regPhone').value,
+                address: document.getElementById('regAddress').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                log('Registration Result:', result);
+            } catch (error) {
+                log('Registration Error:', error.message);
+            }
+        }
+
+        async function login() {
+            const data = {
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                log('Login Result:', result);
+                if (result.customer) {
+                    currentCustomer = result.customer;
+                    document.getElementById('customerId').value = currentCustomer.id;
+                }
+            } catch (error) {
+                log('Login Error:', error.message);
+            }
+        }
+
+        async function browseBooks() {
+            try {
+                const response = await fetch(`${API_BASE}/books`);
+                const books = await response.json();
+                log('Books Loaded:', `${books.length} books found`);
+                
+                const container = document.getElementById('booksContainer');
+                container.innerHTML = books.map(book => `
+                    <div class="border p-4 rounded">
+                        <h3 class="font-semibold">${book.name}</h3>
+                        <p class="text-sm text-gray-600">${book.description}</p>
+                        <p class="text-lg font-bold">$${book.price}</p>
+                        <p class="text-sm ${book.stockStatus === 'Low Stock' ? 'text-orange-500' : book.stockStatus === 'Out of Stock' ? 'text-red-500' : 'text-green-500'}">
+                            ${book.stockStatus} (${book.stockQuantity})
+                        </p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                log('Browse Books Error:', error.message);
+            }
+        }
+
+        async function createSampleOrder() {
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                log('Error: Please enter Customer ID or login first');
+                return;
+            }
+
+            const orderData = {
+                customerId: parseInt(customerId),
+                items: [
+                    { itemId: 1, quantity: 2 },
+                    { itemId: 2, quantity: 1 }
+                ]
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                const result = await response.json();
+                log('Order Creation Result:', result);
+            } catch (error) {
+                log('Order Creation Error:', error.message);
+            }
+        }
+
+        // Load books on page load
+        window.onload = () => {
+            log('Customer API Test Page Loaded');
+            browseBooks();
+        };
+    </script>
+</body>
+</html>
